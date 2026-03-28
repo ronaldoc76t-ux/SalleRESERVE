@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getRooms, getRoomBookings, createBooking, getRoom } from '../services/api';
-import { Room, Booking } from '../types';
+import { Room } from '../types';
+import type { Booking } from '../types';
 
 export default function Booking() {
   const { roomId } = useParams();

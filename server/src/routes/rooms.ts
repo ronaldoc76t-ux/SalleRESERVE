@@ -46,7 +46,7 @@ router.get('/:id', async (req, res) => {
 // Create room (admin only)
 router.post('/', authenticate, async (req, res) => {
   try {
-    if (req.user.role !== 'ADMIN') {
+    if (req.user!.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     
@@ -64,7 +64,7 @@ router.post('/', authenticate, async (req, res) => {
 // Update room (admin only)
 router.put('/:id', authenticate, async (req, res) => {
   try {
-    if (req.user.role !== 'ADMIN') {
+    if (req.user!.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     
@@ -85,7 +85,7 @@ router.put('/:id', authenticate, async (req, res) => {
 // Delete room (admin only)
 router.delete('/:id', authenticate, async (req, res) => {
   try {
-    if (req.user.role !== 'ADMIN') {
+    if (req.user!.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     

@@ -6,6 +6,10 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 
 const app = express();
+// Root route for health check ou default response (doit être après l'init de app)
+app.get('/', (req, res) => {
+  res.send('SalleRESERVE API is running.');
+});
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'sallereserve-secret-key';
 
@@ -186,7 +190,7 @@ app.get('/api/bookings', auth, (req, res) => {
     JOIN rooms r ON b.roomId = r.id
     WHERE b.userId = ?
     ORDER BY b.date, b.startTime
-  `).all(req.user.userId);
+  `).all(req.user!.userId);
   res.json(bookings);
 });
 
@@ -227,7 +231,7 @@ app.post('/api/bookings', auth, (req, res) => {
     const result = db.prepare(`
       INSERT INTO bookings (userId, roomId, date, startTime, endTime, title, description)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(req.user.userId, roomId, date, startTime, endTime, title, description);
+    `).run(req.user!.userId, roomId, date, startTime, endTime, title, description);
     
     const booking = db.prepare('SELECT b.*, r.name as roomName FROM bookings b JOIN rooms r ON b.roomId = r.id WHERE b.id = ?').get(result.lastInsertRowid);
     res.status(201).json(booking);
@@ -241,7 +245,7 @@ app.put('/api/bookings/:id', auth, (req, res) => {
   try {
     const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(parseInt(req.params.id)) as any;
     if (!booking) return res.status(404).json({ error: 'Réservation non trouvée' });
-    if (booking.userId !== req.user.userId && req.user.role !== 'ADMIN') {
+    if (booking.userId !== req.user!.userId && req.user!.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     
@@ -271,7 +275,7 @@ app.put('/api/bookings/:id', auth, (req, res) => {
 app.delete('/api/bookings/:id', auth, (req, res) => {
   const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(parseInt(req.params.id));
   if (!booking) return res.status(404).json({ error: 'Réservation non trouvée' });
-  if ((booking as any).userId !== req.user.userId && req.user.role !== 'ADMIN') {
+  if ((booking as any).userId !== req.user!.userId && req.user!.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Accès refusé' });
   }
   

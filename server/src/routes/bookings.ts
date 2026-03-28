@@ -19,7 +19,7 @@ const bookingSchema = z.object({
 router.get('/', authenticate, async (req, res) => {
   try {
     const bookings = await prisma.booking.findMany({
-      where: { userId: req.user.userId },
+      where: { userId: req.user!.userId },
       include: { room: true },
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });
@@ -79,7 +79,7 @@ router.post('/', authenticate, async (req, res) => {
     }
     
     const booking = await prisma.booking.create({
-      data: { ...data, userId: req.user.userId },
+      data: { ...data, userId: req.user!.userId },
       include: { room: true },
     });
     
@@ -103,7 +103,7 @@ router.put('/:id', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Réservation non trouvée' });
     }
     
-    if (booking.userId !== req.user.userId && req.user.role !== 'ADMIN') {
+    if (booking.userId !== req.user!.userId && req.user!.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     
@@ -160,7 +160,7 @@ router.delete('/:id', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Réservation non trouvée' });
     }
     
-    if (booking.userId !== req.user.userId && req.user.role !== 'ADMIN') {
+    if (booking.userId !== req.user!.userId && req.user!.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     
