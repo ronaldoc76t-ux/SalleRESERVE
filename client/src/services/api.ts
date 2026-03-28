@@ -23,9 +23,15 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
   return res.json();
 }
 
-// Auth
-export const register = (data: { email: string; password: string; name: string }) =>
-  fetchApi<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify(data) });
+// Auth - Register returns user, then we login to get token
+export const register = async (data: { email: string; password: string; name: string }) => {
+  await fetchApi<{ id: number; email: string; name: string; role: string }>('/auth/register', { 
+    method: 'POST', 
+    body: JSON.stringify(data) 
+  });
+  // Auto-login after register
+  return login(data);
+};
 
 export const login = (data: { email: string; password: string }) =>
   fetchApi<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify(data) });
